@@ -19,7 +19,7 @@ public class ClienteManager implements CrudCliente {
 
     public void listarClientes() {
         for (Cliente cliente : clientes.values()) {
-            System.out.println("ID: " + cliente.getId() + ", Nome: " + cliente.getNome());
+            cliente.imprimirDetalhes();
         }
     }
     @Override

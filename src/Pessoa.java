@@ -5,6 +5,7 @@ public abstract class Pessoa implements Imprimivel {
         this.nome = nome;
     }
 
+
     public String getNome() {
         return nome;
     }

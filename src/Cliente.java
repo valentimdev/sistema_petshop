@@ -1,10 +1,9 @@
-public class Cliente {
+public class Cliente extends Pessoa{
     private int id;
-    private String nome;
 
     public Cliente(int id, String nome) {
+        super(nome);
         this.id = id;
-        this.nome = nome;
     }
 
     public int getId() {
@@ -13,4 +12,12 @@ public class Cliente {
 
     public String getNome() {
         return nome;
-    }}
+    }
+    public void imprimirDetalhes(){
+        System.out.println("Nome do cliente: " + getNome()+"\n ID: " + getId());
+    }
+    @Override
+    public String toString() {
+        return "Cliente" + "id=" + id + ", nome=" + nome;
+    }
+}
