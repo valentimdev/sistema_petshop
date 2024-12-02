@@ -1,4 +1,4 @@
-public class Cliente implements Pagavel {
+public class Cliente {
     private int id;
     private String nome;
 
@@ -13,10 +13,4 @@ public class Cliente implements Pagavel {
 
     public String getNome() {
         return nome;
-    }
-
-    @Override
-    public void calcularPagamento(double valor) {
-        System.out.println("Cliente " + nome + " deve pagar R$" + valor);
-    }
-}
+    }}

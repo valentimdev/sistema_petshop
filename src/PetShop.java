@@ -21,7 +21,7 @@ public class PetShop {
             System.out.println("Valor a ser pago: " + valor);
             System.out.print("Escolha uma opção: ");
             opcao = scanner.nextInt();
-            scanner.nextLine(); // Limpa o buffer
+            scanner.nextLine();
 
             switch (opcao) {
                 case 1 -> menuPets(scanner);
@@ -43,25 +43,33 @@ public class PetShop {
             System.out.println("      MENU       ");
             System.out.println("1. Listar Cachorros");
             System.out.println("2. Adicionar Cachorro");
-            System.out.println("3. Vender Cachorro");
-            System.out.println("4. Listar Gatos");
-            System.out.println("5. Adicionar Gato");
-            System.out.println("6. Vender Gato");
+            System.out.println("3. Editar Cachorro");
+            System.out.println("4. Vender Cachorro");
+            System.out.println("5. Listar Gatos");
+            System.out.println("6. Adicionar Gato");
+            System.out.println("7. Editar Gato");
+            System.out.println("8. Vender Gato");
             System.out.println("0. Voltar ao menu principal");
             System.out.println("Valor a ser pago: " + valor);
             System.out.print("Escolha uma opção: ");
             opcao = scanner.nextInt();
             scanner.nextLine(); // Limpa o buffer
 
-            switch (opcao) {
-                case 1 -> petManager.listarCachorros();
-                case 2 -> petManager.adicionarCachorro(scanner);
-                case 3 -> venderPet(scanner, "cachorro");
-                case 4 -> petManager.listarGatos();
-                case 5 -> petManager.adicionarGato(scanner);
-                case 6 -> venderPet(scanner, "gato");
-                case 0 -> System.out.println("Voltando ao menu principal...");
-                default -> System.out.println("Opção inválida.");
+            try {
+                switch (opcao) {
+                    case 1 -> petManager.listarCachorros();
+                    case 2 -> petManager.adicionarCachorro(scanner);
+                    case 3 -> petManager.editarPet(scanner, "cachorro");
+                    case 4 -> venderPet(scanner, "cachorro");
+                    case 5 -> petManager.listarGatos();
+                    case 6 -> petManager.adicionarGato(scanner);
+                    case 7 -> petManager.editarPet(scanner, "gato");
+                    case 8 -> venderPet(scanner, "gato");
+                    case 0 -> System.out.println("Voltando ao menu principal...");
+                    default -> System.out.println("Opção inválida.");
+                }
+            } catch (PetNaoEncontradoException e) {
+                System.out.println("Erro: " + e.getMessage());
             }
         } while (opcao != 0);
     }

@@ -1,7 +1,7 @@
 import java.io.*;
 import java.util.*;
 
-public class PetManager {
+public class PetManager implements CrudPet {
     private static final String CACHORROS_FILE = "cachorros.csv";
     private static final String GATOS_FILE = "gatos.csv";
 
@@ -15,27 +15,21 @@ public class PetManager {
     }
 
     public void listarCachorros() {
-        listarPets(CACHORROS_FILE, "=== Lista de Cachorros ===");
-    }
-
-    public void listarGatos() {
-        listarPets(GATOS_FILE, "=== Lista de Gatos ===");
-    }
-
-    private void listarPets(String fileName, String titulo) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
-            String line;
-            System.out.println(titulo);
-            while ((line = reader.readLine()) != null) {
-                String[] partes = line.split(",");
-                System.out.println("ID: " + partes[0] + ", Nome: " + partes[1] + ", Raça: " + partes[2] + ", Preço: " + partes[3]);
-            }
-        } catch (IOException e) {
-            System.out.println("Erro ao ler: " + fileName);
+        System.out.println("=== Lista de Cachorros ===");
+        for (Animal cachorro : cachorros.values()) {
+            cachorro.imprimirDetalhes();
         }
     }
 
-    private void adicionarPet(Scanner scanner, String fileName, String tipo) {
+    public void listarGatos() {
+        System.out.println("=== Lista de Gatos ===");
+        for (Animal gato : gatos.values()) {
+            gato.imprimirDetalhes();
+        }
+    }
+
+    @Override
+    public void adicionarPet(Scanner scanner, String fileName, String tipo) {
         System.out.print("Digite o nome do " + tipo + ": ");
         String nome = scanner.nextLine();
         System.out.print("Digite a raça do " + tipo + ": ");
@@ -64,6 +58,42 @@ public class PetManager {
 
     public void adicionarGato(Scanner scanner) {
         adicionarPet(scanner, GATOS_FILE, "gato");
+    }
+    @Override
+    public void editarPet(Scanner scanner, String tipo) throws PetNaoEncontradoException {
+        System.out.print("Digite o ID do " + tipo + " para editar: ");
+        int id = scanner.nextInt();
+        scanner.nextLine(); // Limpa o buffer
+
+        Map<Integer, Animal> petsMap;
+        String fileName;
+        if (tipo.equals("cachorro")) {
+            petsMap = cachorros;
+            fileName = CACHORROS_FILE;
+        } else {
+            petsMap = gatos;
+            fileName = GATOS_FILE;
+        }
+
+        if (!petsMap.containsKey(id)) {
+            throw new PetNaoEncontradoException(tipo.substring(0, 1).toUpperCase() + tipo.substring(1) + " com o ID " + id + " não encontrado.");
+        }
+
+        Animal pet = petsMap.get(id);
+        System.out.print("Digite o novo nome do " + tipo + ": ");
+        String novoNome = scanner.nextLine();
+        System.out.print("Digite a nova raça do " + tipo + ": ");
+        String novaRaca = scanner.nextLine();
+        System.out.print("Digite o novo preço do " + tipo + ": ");
+        double novoPreco = scanner.nextDouble();
+        scanner.nextLine(); // Limpa o buffer
+
+        pet.setNome(novoNome);
+        pet.setRaca(novaRaca);
+        pet.setPreco(novoPreco);
+
+        salvarPets(fileName, petsMapToList(petsMap));
+        System.out.println(tipo.substring(0, 1).toUpperCase() + tipo.substring(1) + " editado com sucesso.");
     }
 
     public float venderCachorro(int id, float valor) {

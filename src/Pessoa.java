@@ -1,4 +1,4 @@
-public abstract class Pessoa implements Registravel, Imprimivel {
+public abstract class Pessoa implements Imprimivel {
     protected String nome;
 
     public Pessoa(String nome) {

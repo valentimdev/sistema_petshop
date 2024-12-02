@@ -1,7 +1,7 @@
 import java.io.*;
 import java.util.*;
 
-public class ClienteManager {
+public class ClienteManager implements CrudCliente {
     private static final String CLIENTES_FILE = "clientes.csv";
     private Map<Integer, Cliente> clientes = new HashMap<>();
 
@@ -22,10 +22,20 @@ public class ClienteManager {
             System.out.println("ID: " + cliente.getId() + ", Nome: " + cliente.getNome());
         }
     }
-
+    @Override
     public void adicionarCliente(Scanner scanner) {
-        System.out.print("Digite o ID do cliente: ");
-        int id = scanner.nextInt();
+        int id = -1;
+        boolean idValido = false;
+        while (!idValido) {
+            System.out.print("Digite o ID do cliente: ");
+            try {
+                id = scanner.nextInt();
+                idValido = true;
+            } catch (InputMismatchException e) {
+                System.out.println("ID inválido. Por favor, digite um número inteiro.");
+                scanner.next();
+            }
+        }
         scanner.nextLine(); // Limpa o buffer
         System.out.print("Digite o nome do cliente: ");
         String nome = scanner.nextLine();
@@ -36,6 +46,8 @@ public class ClienteManager {
         System.out.println("Cliente adicionado com sucesso.");
     }
 
+
+    @Override
     public void removerCliente(Scanner scanner) throws ClienteNaoEncontradoException {
         System.out.print("Digite o ID do cliente para remover: ");
         int id = scanner.nextInt();
