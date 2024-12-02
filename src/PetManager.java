@@ -5,8 +5,8 @@ public class PetManager {
     private static final String CACHORROS_FILE = "cachorros.csv";
     private static final String GATOS_FILE = "gatos.csv";
 
-    private Map<Integer, Animal> cachorros = new HashMap<>();
-    private Map<Integer, Animal> gatos = new HashMap<>();
+    private final Map<Integer, Animal> cachorros = new HashMap<>();
+    private final Map<Integer, Animal> gatos = new HashMap<>();
     private int petIdCounter = 1;
 
     public PetManager() {
@@ -31,16 +31,8 @@ public class PetManager {
                 System.out.println("ID: " + partes[0] + ", Nome: " + partes[1] + ", Raça: " + partes[2] + ", Preço: " + partes[3]);
             }
         } catch (IOException e) {
-            System.out.println("Erro ao ler o arquivo: " + fileName);
+            System.out.println("Erro ao ler: " + fileName);
         }
-    }
-
-    public void adicionarCachorro(Scanner scanner) {
-        adicionarPet(scanner, CACHORROS_FILE, "cachorro");
-    }
-
-    public void adicionarGato(Scanner scanner) {
-        adicionarPet(scanner, GATOS_FILE, "gato");
     }
 
     private void adicionarPet(Scanner scanner, String fileName, String tipo) {
@@ -50,7 +42,7 @@ public class PetManager {
         String raca = scanner.nextLine();
         System.out.print("Digite o preço do " + tipo + ": ");
         double preco = scanner.nextDouble();
-        scanner.nextLine(); // Limpa o buffer
+        scanner.nextLine();
 
         int id = petIdCounter++;
         Animal pet;
@@ -66,28 +58,61 @@ public class PetManager {
         System.out.println(tipo + " adicionado com sucesso.");
     }
 
-    public void removerCachorro(Scanner scanner) throws PetNaoEncontradoException {
-        removerPet(scanner, CACHORROS_FILE, "cachorro", cachorros);
+    public void adicionarCachorro(Scanner scanner) {
+        adicionarPet(scanner, CACHORROS_FILE, "cachorro");
     }
 
-    public void removerGato(Scanner scanner) throws PetNaoEncontradoException {
-        removerPet(scanner, GATOS_FILE, "gato", gatos);
+    public void adicionarGato(Scanner scanner) {
+        adicionarPet(scanner, GATOS_FILE, "gato");
     }
 
-    private void removerPet(Scanner scanner, String fileName, String tipo, Map<Integer, Animal> petsMap) throws PetNaoEncontradoException {
-        System.out.print("Digite o ID do " + tipo + " para remover: ");
-        int id = scanner.nextInt();
-        scanner.nextLine(); // Limpa o buffer
+    public float venderCachorro(int id, float valor) {
+        try {
+            if (!cachorros.containsKey(id)) {
+                throw new PetNaoEncontradoException("Cachorro com o ID " + id + " não encontrado.");
+            }
 
-        if (!petsMap.containsKey(id)) {
-            throw new PetNaoEncontradoException("Um " + tipo + " com o ID " + id + " não foi encontrado.");
+            Animal cachorro = cachorros.get(id);
+            valor += cachorro.getPreco();
+            cachorros.remove(id);
+            reindexarPets(cachorros);
+            salvarPets(CACHORROS_FILE, petsMapToList(cachorros));
+
+            System.out.println("Cachorro vendido com sucesso por R$" + cachorro.getPreco());
+        } catch (PetNaoEncontradoException e) {
+            System.out.println(e.getMessage());
         }
+        return valor;
+    }
 
-        petsMap.remove(id);
-        reindexIds(petsMap);
+    public float venderGato(int id, float valor) {
+        try {
+            if (!gatos.containsKey(id)) {
+                throw new PetNaoEncontradoException("Gato com o ID " + id + " não encontrado.");
+            }
 
-        salvarPets(fileName, petsMapToList(fileName.equals(CACHORROS_FILE) ? cachorros : gatos));
-        System.out.println(tipo + " removido com sucesso.");
+            Animal gato = gatos.get(id);
+            valor += gato.getPreco();
+            gatos.remove(id);
+            reindexarPets(gatos);
+            salvarPets(GATOS_FILE, petsMapToList(gatos));
+
+            System.out.println("Gato vendido com sucesso por R$" + gato.getPreco());
+        } catch (PetNaoEncontradoException e) {
+            System.out.println(e.getMessage());
+        }
+        return valor;
+    }
+
+    private void reindexarPets(Map<Integer, Animal> petsMap) {
+        int novoId = 1;
+        Map<Integer, Animal> petsReindexados = new HashMap<>();
+        for (Animal pet : petsMap.values()) {
+            pet.setId(novoId++);
+            petsReindexados.put(pet.getId(), pet);
+        }
+        petsMap.clear();
+        petsMap.putAll(petsReindexados);
     }
 
     private void carregarPets(String fileName, Map<Integer, Animal> petsMap) {
@@ -97,7 +122,7 @@ public class PetManager {
             while ((line = reader.readLine()) != null) {
                 if (isFirstLine) {
                     isFirstLine = false;
-                    continue; // Ignora a primeira linha (cabeçalho)
+                    continue;
                 }
                 String[] partes = line.split(",");
                 int id = Integer.parseInt(partes[0].trim());
@@ -142,16 +167,5 @@ public class PetManager {
             petsData.add(pet.toString());
         }
         return petsData;
-    }
-
-    private void reindexIds(Map<Integer, Animal> petsMap) {
-        int newId = 1;
-        for (Map.Entry<Integer, Animal> entry : new HashMap<>(petsMap).entrySet()) {
-            Animal pet = entry.getValue();
-            petsMap.remove(entry.getKey());
-            pet.setId(newId++);
-            petsMap.put(pet.getId(), pet);
-        }
-        petIdCounter = newId;
     }
 }
