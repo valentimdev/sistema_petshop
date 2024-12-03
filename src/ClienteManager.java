@@ -24,19 +24,12 @@ public class ClienteManager implements CrudCliente {
     }
     @Override
     public void adicionarCliente(Scanner scanner) {
-        int id = -1;
-        boolean idValido = false;
-        while (!idValido) {
-            System.out.print("Digite o ID do cliente: ");
-            try {
-                id = scanner.nextInt();
-                idValido = true;
-            } catch (InputMismatchException e) {
-                System.out.println("ID inválido. Por favor, digite um número inteiro.");
-                scanner.next();
-            }
+        int id = 1;
+        if (!clientes.isEmpty()) {
+            id = clientes.keySet().stream().max(Integer::compareTo).orElse(0) + 1;
         }
-        scanner.nextLine(); // Limpa o buffer
+
+        System.out.println("Novo ID gerado: " + id);
         System.out.print("Digite o nome do cliente: ");
         String nome = scanner.nextLine();
 

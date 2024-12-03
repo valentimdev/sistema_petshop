@@ -63,7 +63,7 @@ public class PetManager implements CrudPet {
     public void editarPet(Scanner scanner, String tipo) throws PetNaoEncontradoException {
         System.out.print("Digite o ID do " + tipo + " para editar: ");
         int id = scanner.nextInt();
-        scanner.nextLine(); // Limpa o buffer
+        scanner.nextLine();
 
         Map<Integer, Animal> petsMap;
         String fileName;
