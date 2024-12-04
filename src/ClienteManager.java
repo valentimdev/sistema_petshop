@@ -4,6 +4,7 @@ import java.util.*;
 public class ClienteManager implements CrudCliente {
     private static final String CLIENTES_FILE = "clientes.csv";
     private Map<Integer, Cliente> clientes = new HashMap<>();
+    private int clienteIdCounter = 1;
 
     public ClienteManager() {
         carregarClientes(CLIENTES_FILE);
@@ -22,14 +23,12 @@ public class ClienteManager implements CrudCliente {
             cliente.imprimirDetalhes();
         }
     }
+
     @Override
     public void adicionarCliente(Scanner scanner) {
-        int id = 1;
-        if (!clientes.isEmpty()) {
-            id = clientes.keySet().stream().max(Integer::compareTo).orElse(0) + 1;
-        }
-
+        int id = clienteIdCounter++;
         System.out.println("Novo ID gerado: " + id);
+
         System.out.print("Digite o nome do cliente: ");
         String nome = scanner.nextLine();
 
@@ -39,30 +38,18 @@ public class ClienteManager implements CrudCliente {
         System.out.println("Cliente adicionado com sucesso.");
     }
 
-
     @Override
     public void removerCliente(Scanner scanner) throws ClienteNaoEncontradoException {
         System.out.print("Digite o ID do cliente para remover: ");
         int id = scanner.nextInt();
-        scanner.nextLine(); // Limpa o buffer
+        scanner.nextLine();
 
         if (!clientes.containsKey(id)) {
             throw new ClienteNaoEncontradoException("Cliente com ID " + id + " não encontrado.");
         }
         clientes.remove(id);
-        reindexarClientes();
         salvarClientes(CLIENTES_FILE);
         System.out.println("Cliente removido com sucesso.");
-    }
-
-    private void reindexarClientes() {
-        int novoId = 1;
-        Map<Integer, Cliente> clientesReindexados = new HashMap<>();
-        for (Cliente cliente : clientes.values()) {
-            cliente = new Cliente(novoId++, cliente.getNome());
-            clientesReindexados.put(cliente.getId(), cliente);
-        }
-        clientes = clientesReindexados;
     }
 
     private void carregarClientes(String fileName) {
@@ -80,6 +67,10 @@ public class ClienteManager implements CrudCliente {
 
                 Cliente cliente = new Cliente(id, nome);
                 clientes.put(id, cliente);
+
+                if (id >= clienteIdCounter) {
+                    clienteIdCounter = id + 1;
+                }
             }
         } catch (IOException e) {
             System.out.println("Erro ao carregar o arquivo: " + fileName);
@@ -88,10 +79,10 @@ public class ClienteManager implements CrudCliente {
 
     private void salvarClientes(String fileName) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-            writer.write("ID,Nome,Telefone");
+            writer.write("ID,Nome");
             writer.newLine();
             for (Cliente cliente : clientes.values()) {
-                writer.write(cliente.getId() + "," + cliente.getNome() + ",");
+                writer.write(cliente.getId() + "," + cliente.getNome());
                 writer.newLine();
             }
         } catch (IOException e) {
