@@ -12,4 +12,14 @@ public class Gato extends Animal {
     public void imprimirDetalhes() {
         System.out.println(this);
     }
+
+    @Override
+    public String toString() {
+        return "Gato{" +
+                "id=" + id +
+                ", nome='" + nome + '\'' +
+                ", raca='" + raca + '\'' +
+                ", preco=" + preco +
+                '}';
+    }
 }

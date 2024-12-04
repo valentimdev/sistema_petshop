@@ -1,9 +1,7 @@
 import java.io.*;
 import java.util.*;
 
-public class PetManager implements CrudPet {
-    private static final String CACHORROS_FILE = "cachorros.csv";
-    private static final String GATOS_FILE = "gatos.csv";
+public class PetManager extends ArquivosPet implements CrudPet {
 
     private final Map<Integer, Animal> cachorros = new HashMap<>();
     private final Map<Integer, Animal> gatos = new HashMap<>();
@@ -48,7 +46,7 @@ public class PetManager implements CrudPet {
             gatos.put(id, pet);
         }
 
-        salvarPets(fileName, petsMapToList(fileName.equals(CACHORROS_FILE) ? cachorros : gatos));
+        salvarPets(fileName, fileName.equals(CACHORROS_FILE) ? cachorros : gatos);
         System.out.println(tipo + " adicionado com sucesso.");
     }
 
@@ -59,6 +57,7 @@ public class PetManager implements CrudPet {
     public void adicionarGato(Scanner scanner) {
         adicionarPet(scanner, GATOS_FILE, "gato");
     }
+
     @Override
     public void editarPet(Scanner scanner, String tipo) throws PetNaoEncontradoException {
         System.out.print("Digite o ID do " + tipo + " para editar: ");
@@ -86,13 +85,13 @@ public class PetManager implements CrudPet {
         String novaRaca = scanner.nextLine();
         System.out.print("Digite o novo preço do " + tipo + ": ");
         double novoPreco = scanner.nextDouble();
-        scanner.nextLine(); // Limpa o buffer
+        scanner.nextLine();
 
         pet.setNome(novoNome);
         pet.setRaca(novaRaca);
         pet.setPreco(novoPreco);
 
-        salvarPets(fileName, petsMapToList(petsMap));
+        salvarPets(fileName, petsMap);
         System.out.println(tipo.substring(0, 1).toUpperCase() + tipo.substring(1) + " editado com sucesso.");
     }
 
@@ -106,7 +105,7 @@ public class PetManager implements CrudPet {
             valor += cachorro.getPreco();
             cachorros.remove(id);
             reindexarPets(cachorros);
-            salvarPets(CACHORROS_FILE, petsMapToList(cachorros));
+            salvarPets(CACHORROS_FILE, cachorros);
 
             System.out.println("Cachorro vendido com sucesso por R$" + cachorro.getPreco());
         } catch (PetNaoEncontradoException e) {
@@ -125,7 +124,7 @@ public class PetManager implements CrudPet {
             valor += gato.getPreco();
             gatos.remove(id);
             reindexarPets(gatos);
-            salvarPets(GATOS_FILE, petsMapToList(gatos));
+            salvarPets(GATOS_FILE, gatos);
 
             System.out.println("Gato vendido com sucesso por R$" + gato.getPreco());
         } catch (PetNaoEncontradoException e) {
@@ -178,24 +177,16 @@ public class PetManager implements CrudPet {
         }
     }
 
-    private void salvarPets(String fileName, List<String> petsData) {
+    private void salvarPets(String fileName, Map<Integer, Animal> petsMap) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             writer.write("ID,Nome,Raça,Preço");
             writer.newLine();
-            for (String petData : petsData) {
-                writer.write(petData);
+            for (Animal pet : petsMap.values()) {
+                writer.write(pet.getId() + "," + pet.getNome() + "," + pet.getRaca() + "," + pet.getPreco());
                 writer.newLine();
             }
         } catch (IOException e) {
             System.out.println("Erro ao salvar o arquivo de pets.");
         }
-    }
-
-    private List<String> petsMapToList(Map<Integer, Animal> petsMap) {
-        List<String> petsData = new ArrayList<>();
-        for (Animal pet : petsMap.values()) {
-            petsData.add(pet.toString());
-        }
-        return petsData;
     }
 }
